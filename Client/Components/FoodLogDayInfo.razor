@@ -1,0 +1,43 @@
+﻿@using WeightTrack.Shared.BindingModels
+@using WeightTrack.Shared.Models.Enums
+
+<div class="card">
+    <div class="card-header">
+        @Title
+    </div>
+    <div class="card-body">
+        <ul class="list-group mb-3">
+            @foreach (var item in Logs)
+            {
+                <li class="list-group-item food-log">
+                    <span class="food-log-text">@item.FoodName - @item.Calories kcal</span> 
+                    <span class="food-log-actions">
+                        <a href="/edit-food-log/@item.Id" class="btn">Edit</a>
+                        <button class="btn" @onclick="@(() => OnDeleteButtonClick(item))">Delete</button>
+                    </span>
+                </li>
+            }
+        </ul>
+
+        <a href="add-food-log/@((int)Type)" class="btn btn-primary">Add @Title</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public FoodLogType Type { get; set; }
+
+    [Parameter]
+    public IEnumerable<FoodLogBindingModel> Logs { get; set; } = Enumerable.Empty<FoodLogBindingModel>();
+
+    [Parameter]
+    public EventCallback<FoodLogBindingModel> OnFoodLogDelete { get; set; }
+
+    private async Task OnDeleteButtonClick(FoodLogBindingModel itemForDelete)
+    {
+        await OnFoodLogDelete.InvokeAsync(itemForDelete);
+    }
+}

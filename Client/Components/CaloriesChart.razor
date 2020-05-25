@@ -1,0 +1,42 @@
+﻿@using WeightTrack.Shared.BindingModels
+@using WeightTrack.Shared.Models.Enums
+@using WeightTrack.Client.Common
+@using WeightTrack.Client.Services
+
+@inject ChartDataGenerator chartGenerator
+
+<TelerikChart>
+    <ChartSeriesItems>
+        <ChartSeries Type="ChartSeriesType.Donut"
+                     Data="@Data"
+                     Field="@nameof(PieChartModel.SegmentValue)"
+                     ColorField="@nameof(PieChartModel.Color)"
+                     CategoryField="@nameof(PieChartModel.SegmentName)">
+            <ChartSeriesLabels Visible="true"
+                               Template="#=category# #=value#"
+                               Background="transparent"
+                               Position="ChartSeriesLabelsPosition.OutsideEnd" />
+        </ChartSeries>
+
+    </ChartSeriesItems>
+
+    <ChartTitle Text="Calories Budget"></ChartTitle>
+
+    <ChartLegend Position="ChartLegendPosition.Bottom">
+    </ChartLegend>
+</TelerikChart>
+
+@code {
+    [Parameter]
+    public decimal TodayCalories { get; set; } = 0;
+
+    [Parameter]
+    public List<PieChartModel> Data { get; set; } = new List<PieChartModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Data = chartGenerator.GenerateCaloriesChartData(TodayCalories).ToList();
+
+        await base.OnInitializedAsync();
+    }
+}

@@ -1,0 +1,78 @@
+@page "/log"
+
+@using Microsoft.AspNetCore.Authorization
+@using WeightTrack.Shared.BindingModels
+@using WeightTrack.Shared.Models.Enums;
+
+@attribute [Authorize]
+@inject HttpClient Http
+
+<h1>Today Logs</h1>
+
+<p>@*// Chart with today calories*@</p>
+
+<FoodLogDayInfo Logs="Logs.Where(x => x.Type == FoodLogType.Breakfast)" Title="Breakfast" Type="@FoodLogType.Breakfast" OnFoodLogDelete="@OnDeleteButtonClick"></FoodLogDayInfo>
+
+<FoodLogDayInfo Logs="Logs.Where(x => x.Type == FoodLogType.Lunch)" Title="Lunch" Type="@FoodLogType.Lunch" OnFoodLogDelete="@OnDeleteButtonClick"></FoodLogDayInfo>
+
+<FoodLogDayInfo Logs="Logs.Where(x => x.Type == FoodLogType.Dinner)" Title="Diner" Type="@FoodLogType.Dinner" OnFoodLogDelete="@OnDeleteButtonClick"></FoodLogDayInfo>
+
+<FoodLogDayInfo Logs="Logs.Where(x => x.Type == FoodLogType.Snack)" Title="Snack" Type="@FoodLogType.Snack" OnFoodLogDelete="@OnDeleteButtonClick"></FoodLogDayInfo>
+
+<div class="card">
+    <div class="card-header">
+        Weight
+    </div>
+    <div class="card-body">
+        @if (WeightLog != null)
+        {
+
+            <h5 class="card-title">You already log your weight today</h5>
+            <p class="card-text">Good Job.</p>
+
+            <ul class="list-group mb-3">
+                <li class="list-group-item food-log">
+                    <span>@(WeightLog.Weight) kg.</span> <span><button @onclick="@OnWeightLogDeleteButtonClick">Delete</button></span>
+                </li>
+
+            </ul>
+        }
+        else
+        {
+            <h5 class="card-title">You still didn't log your weight today</h5>
+            <p class="card-text">Better do it now.</p>
+            <a href="add-weight-log" class="btn btn-primary">Add Weight</a>
+        }
+
+    </div>
+</div>
+
+@code {
+    public IEnumerable<FoodLogBindingModel> Logs { get; set; } = Enumerable.Empty<FoodLogBindingModel>();
+    public WeightLogBindingModel WeightLog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task LoadData()
+    {
+        Logs = await Http.GetFromJsonAsync<IEnumerable<FoodLogBindingModel>>("FoodLogs/GetUserLogs");
+        var weightLogs = await Http.GetFromJsonAsync<IEnumerable<WeightLogBindingModel>>("WeightLogs/GetUserLogs");
+        WeightLog = weightLogs.FirstOrDefault();
+    }
+
+    private async Task OnDeleteButtonClick(FoodLogBindingModel itemForDelete)
+    {
+        var result = await Http.PostAsJsonAsync<FoodLogBindingModel>("FoodLogs/Delete", itemForDelete);
+        await LoadData();
+    }
+
+    private async Task OnWeightLogDeleteButtonClick()
+    {
+        var result = await Http.PostAsJsonAsync<WeightLogBindingModel>("WeightLogs/Delete", WeightLog);
+        await LoadData();
+    }
+}

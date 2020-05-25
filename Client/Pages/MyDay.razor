@@ -1,0 +1,66 @@
+@page "/my-day"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject HttpClient Http
+
+<h1>My Day</h1>
+
+<TelerikChart>
+    <ChartSeriesItems>
+        <ChartSeries Type="ChartSeriesType.Donut"
+                     Data="@pieData"
+                     Field="@nameof(MyPieChartModel.SegmentValue)"
+                     ColorField="@nameof(MyPieChartModel.Color)"
+                     CategoryField="@nameof(MyPieChartModel.SegmentName)">
+            <ChartSeriesLabels Visible="true"
+                               Template="#=category# #=value#"
+                               Background="transparent"
+                               Position="ChartSeriesLabelsPosition.OutsideEnd" />
+        </ChartSeries>
+       
+    </ChartSeriesItems>
+
+    <ChartTitle Text="Calories Budget"></ChartTitle>
+
+    <ChartLegend Position="ChartLegendPosition.Bottom">
+    </ChartLegend>
+</TelerikChart>
+
+@code {
+    public decimal TodayCalories { get; set; } = 0;
+
+    public class MyPieChartModel
+    {
+        public string SegmentName { get; set; }
+        public decimal SegmentValue { get; set; }
+        public string Color { get; set; }
+    }
+
+    public List<MyPieChartModel> pieData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        TodayCalories = await Http.GetFromJsonAsync<decimal>("FoodLogs/GetUserCalories");
+
+        pieData = new List<MyPieChartModel>
+        {
+            new MyPieChartModel
+            {
+                SegmentName = TodayCalories > 2200 ? "Exceeded Calories" : "Left Calories",
+                SegmentValue = Math.Abs(2200 - TodayCalories),
+                Color= TodayCalories > 2200 ? "#ff471a" : "#D8D8D8"
+            },
+            new MyPieChartModel
+            {
+                SegmentName = "Today Calories",
+                SegmentValue = TodayCalories,
+                Color= "#00ff00"
+            }
+        };
+        await base.OnInitializedAsync();
+    }
+}
+
+
+@*Chart last 7 days calories*@
+

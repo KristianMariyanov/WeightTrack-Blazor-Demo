@@ -1,0 +1,48 @@
+@page "/add-weight-log"
+
+@using Microsoft.AspNetCore.Authorization
+@using WeightTrack.Shared.BindingModels
+
+@attribute [Authorize]
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h1>Add Weight Log</h1>
+
+<EditForm Model="WeightLog" OnValidSubmit="@OnSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="weight">Weight</label>
+        <InputNumber @bind-Value="@WeightLog.Weight" class="form-control" id="weight"></InputNumber>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Log</button>
+</EditForm>
+
+@code {
+    public WeightLogBindingModel WeightLog { get; set; } = new WeightLogBindingModel();
+
+    [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private async Task OnSubmit()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            var response = await Http.PostAsJsonAsync<WeightLogBindingModel>("WeightLogs/Add", WeightLog);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("log");
+            }
+        }
+    }
+
+    protected override bool ShouldRender () { 
+        Console.WriteLine("ShpuldRender - AddWeightLog");
+        return base.ShouldRender();}
+    }

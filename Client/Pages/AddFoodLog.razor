@@ -1,0 +1,84 @@
+@page "/add-food-log/{type:int}"
+@using Microsoft.AspNetCore.Authorization
+@using WeightTrack.Shared.BindingModels
+@using WeightTrack.Shared.Models.Enums;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h1>Add Food Log</h1>
+
+<EditForm Model="FoodLog" OnValidSubmit="@OnSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="food-type">Food Type</label>
+        <InputSelect @bind-Value="@FoodLog.Type" class="form-control" id="food-type">
+            <option value="@FoodLogType.Breakfast">@FoodLogType.Breakfast.ToString()</option>
+            <option value="@FoodLogType.Lunch">@FoodLogType.Lunch.ToString()</option>
+            <option value="@FoodLogType.Dinner">@FoodLogType.Dinner.ToString()</option>
+            <option value="@FoodLogType.Snack">@FoodLogType.Snack.ToString()</option>
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <InputNumber @bind-Value="@FoodLog.Quantity" class="form-control" id="quantity"></InputNumber>
+    </div>
+
+    @*TODO: Add search*@
+    @if (Foods == null || Foods.Any())
+    {
+        <div class="form-group">
+            <label for="food-select">Food</label>
+            <InputSelectNumber @bind-Value="@FoodLog.FoodId" class="form-control" id="food-select">
+                @foreach (var food in Foods)
+                {
+                    <option value="@food.Id">@food.Name</option>
+                }
+            </InputSelectNumber>
+        </div>
+    }
+
+    @*// Add calculated calories*@
+
+    <button type="submit" class="btn btn-primary">Add Log</button>
+</EditForm>
+
+
+@code {
+    public FoodLogUpdateBindingModel FoodLog { get; set; } = new FoodLogUpdateBindingModel();
+    public IEnumerable<FoodBindingModel> Foods { get; set; } = Enumerable.Empty<FoodBindingModel>();
+
+    [Parameter]
+    public FoodLogType Type { get; set; }
+
+    private async Task OnSubmit()
+    {
+        var response = await Http.PostAsJsonAsync<FoodLogUpdateBindingModel>("FoodLogs/Add", FoodLog);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("log");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        FoodLog.Type = Type;
+
+        try
+        {
+            Foods = await Http.GetFromJsonAsync<IEnumerable<FoodBindingModel>>("Foods/Get");
+            FoodLog.FoodId = Foods?.FirstOrDefault()?.Id ?? 0;
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+
+
+        await base.OnInitializedAsync();
+    }
+}
