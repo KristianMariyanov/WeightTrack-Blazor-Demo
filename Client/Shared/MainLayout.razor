@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+
 @inject AuthenticationStateProvider AuthProvider
 
 <TelerikRootComponent>
@@ -17,20 +18,10 @@
             </Content>
         </TelerikDrawer>
     </div>
-
-    <AuthorizeView>
-        <Authorized>
-            @{IsUserAuthenticated = true;}
-        </Authorized>
-        <NotAuthorized>
-            @{IsUserAuthenticated = false;}
-        </NotAuthorized>
-    </AuthorizeView>
 </TelerikRootComponent>
 
 @code {
     public TelerikDrawer<DrawerItem> Drawer { get; set; }
-    public bool IsUserAuthenticated { get; set; } = false;
     public List<DrawerItem> Data { get; set; } = new List<DrawerItem> { new DrawerItem { Text = "Home", Icon = "home", Url = "/" } };
 
     public async Task ToggleDrawer() => await Drawer.ToggleAsync();
@@ -48,14 +39,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //Data = new List<DrawerItem> { new DrawerItem { Text = "Home", Icon = "home", Url = "/" } };
-
-        //if (IsUserAuthenticated)
-        //{
-        //    Data.Add(new DrawerItem { Text = "MyDay", Icon = IconName.CalendarDate, Url = "my-day" });
-        //    Data.Add(new DrawerItem { Text = "Log", Icon = IconName.ListUnordered, Url = "log" });
-        //}
-
         Data = new List<DrawerItem> { new DrawerItem { Text = "Home", Icon = "home", Url = "/" } };
 
         var authState = await AuthProvider.GetAuthenticationStateAsync();

@@ -25,7 +25,6 @@ namespace WeightTrack.Tests
             // Act
             var cut = ctx.RenderComponent<CaloriesChart>(ComponentParameter.CreateParameter("TodayCalories", 600m));
 
-
             // Assert
             var componentData = cut.Instance.Data;
             Assert.Collection(componentData,

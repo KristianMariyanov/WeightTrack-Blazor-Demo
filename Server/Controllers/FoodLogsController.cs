@@ -27,8 +27,6 @@ namespace WeightTrack.Server.Controllers
             this._userManager = userManager;
         }
 
-
-
         public async Task<IActionResult> GetUserCalories(DateTime? date)
         {
             var user = await _userManager.GetUserAsync(User);

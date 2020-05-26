@@ -51,6 +51,8 @@
     public IEnumerable<FoodLogBindingModel> Logs { get; set; } = Enumerable.Empty<FoodLogBindingModel>();
     public WeightLogBindingModel WeightLog { get; set; }
 
+    public bool ShouldRenderComponent { get; set; } = true;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -66,8 +68,16 @@
 
     private async Task OnDeleteButtonClick(FoodLogBindingModel itemForDelete)
     {
+        ShouldRenderComponent = false;
         var result = await Http.PostAsJsonAsync<FoodLogBindingModel>("FoodLogs/Delete", itemForDelete);
         await LoadData();
+        ShouldRenderComponent = true;
+    }
+
+    protected override bool ShouldRender()
+    {
+        Console.WriteLine("Should Render - Log " + ShouldRenderComponent);
+        return ShouldRenderComponent;
     }
 
     private async Task OnWeightLogDeleteButtonClick()

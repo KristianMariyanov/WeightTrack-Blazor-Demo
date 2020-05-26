@@ -10,7 +10,7 @@
             @foreach (var item in Logs)
             {
                 <li class="list-group-item food-log">
-                    <span class="food-log-text">@item.FoodName - @item.Calories kcal</span> 
+                    <span class="food-log-text">@item.FoodName - @item.Calories kcal</span>
                     <span class="food-log-actions">
                         <a href="/edit-food-log/@item.Id" class="btn">Edit</a>
                         <button class="btn" @onclick="@(() => OnDeleteButtonClick(item))">Delete</button>
@@ -36,8 +36,18 @@
     [Parameter]
     public EventCallback<FoodLogBindingModel> OnFoodLogDelete { get; set; }
 
+    public bool ShouldRenderComponent { get; set; } = true;
+
     private async Task OnDeleteButtonClick(FoodLogBindingModel itemForDelete)
     {
+        ShouldRenderComponent = false;
         await OnFoodLogDelete.InvokeAsync(itemForDelete);
+        ShouldRenderComponent = true;
+    }
+
+    protected override bool ShouldRender()
+    {
+        Console.WriteLine("Should Render - FoodLogDayInfo - " + Type.ToString() + " " + ShouldRenderComponent);
+        return ShouldRenderComponent;
     }
 }

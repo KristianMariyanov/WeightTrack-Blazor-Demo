@@ -24,26 +24,23 @@
         </InputSelect>
     </div>
 
-    <div class="form-group">
-        <label for="quantity">Quantity</label>
-        <InputNumber @bind-Value="@FoodLog.Quantity" class="form-control" id="quantity"></InputNumber>
-    </div>
-
-    @*TODO: Add search*@
     @if (Foods == null || Foods.Any())
     {
         <div class="form-group">
             <label for="food-select">Food</label>
             <InputSelectNumber @bind-Value="@FoodLog.FoodId" class="form-control" id="food-select">
                 @foreach (var food in Foods)
-                {
+                    {
                     <option value="@food.Id">@food.Name</option>
-                }
+                    }
             </InputSelectNumber>
         </div>
     }
 
-    @*// Add calculated calories*@
+    <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <InputNumber @bind-Value="@FoodLog.Quantity" class="form-control" id="quantity"></InputNumber>
+    </div>
 
     <button type="submit" class="btn btn-primary">Add Log</button>
 </EditForm>

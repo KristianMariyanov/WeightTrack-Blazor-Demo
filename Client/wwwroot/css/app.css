@@ -31,6 +31,10 @@ app {
     justify-content: space-between;
 }
 
+.k-drawer-container {
+    height: 950px;
+}
+
 .main {
     flex: 1;
 }
@@ -104,6 +108,10 @@ app {
 
 .content {
     padding-top: 1.1rem;
+}
+
+.main .top-row.auth {
+    z-index: 10000;
 }
 
 .navbar-toggler {
